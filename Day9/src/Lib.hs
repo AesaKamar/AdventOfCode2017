@@ -24,6 +24,7 @@ parserGarbage = do
   _ <- string ">"
   return (Garbage $ concat contents)
 
+normalChars :: Parser [Char]
 normalChars = (many1 validChars) <|> try escapedPair
   where
     validChars =
@@ -42,3 +43,12 @@ parseGroups = do
   stuff <- (parseGroups <|> parserGarbage) `sepBy` string ","
   _ <- string "}"
   return (Group stuff)
+
+countGroups :: Input -> Int
+countGroups (Garbage _) = 0
+countGroups (Group stuff) = 1 + sum (countGroups <$> stuff)
+
+scoreGroups :: Int -> Input -> Int
+scoreGroups level (Garbage _) = level
+scoreGroups level (Group stuff) =
+  level + sum ((scoreGroups (level + 1)) <$> stuff)

@@ -51,7 +51,20 @@ main =
         "{{<a>},{<a>},{<a>},{<a>}}"
         parseGroups
         (Right $ Group (replicate 4 (Group [Garbage "a"])))
+    describe "Counting groups" $ do
+      it "{}" $ countGroups (Group []) `shouldBe` 1
+      it "{{{}}}" $ countGroups (Group [Group [Group []]]) `shouldBe` 3
+      it "{{},{}}" $ countGroups (Group [Group [], Group []]) `shouldBe` 3
+      it "{{{},{},{{}}}}" $
+        countGroups (Group [Group [Group [], Group [], Group [Group []]]]) `shouldBe`
+        6
+    describe "Scoring groups" $ do
+      it "{}" $ scoreGroups 1 (Group []) `shouldBe` 1
+      it "{{{}}}" $ scoreGroups 1 (Group [Group [Group []]]) `shouldBe` 6
+      it "{{{},{},{{}}}}" $
+        scoreGroups 1 (Group [Group [Group [], Group [], Group [Group []]]]) `shouldBe`
+        16
 
--- Wow this is magical
+-- Wow this is magic al
 shouldParseAs inputString parser expectation =
   it inputString $ parse parser "" inputString `shouldBe` expectation
