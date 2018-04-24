@@ -23,9 +23,14 @@ parserGarbage = do
   _ <- string ">"
   return (Garbage $ concat contents)
 
-normalChars = (many1 validChars) <|> try (string "!>") <|> try (string "!!")
+normalChars = (many1 validChars) <|> try escapedPair
   where
     validChars =
       oneOf
         (['a' .. 'z'] <> ['A' .. 'Z'] <> ['0' .. '9'] <>
-         ['\'', '\"', '<', ' ', '{', '}'])
+         ['\'', '\"', '<', ' ', '{', '}', ','])
+    specialChars = oneOf ['>', '!']
+    escapedPair = do
+      exclamation <- (char '!')
+      following <- validChars <|> specialChars
+      return [exclamation, following]
