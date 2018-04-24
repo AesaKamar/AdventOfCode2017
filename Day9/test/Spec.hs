@@ -52,19 +52,34 @@ main =
         parseGroups
         (Right $ Group (replicate 4 (Group [Garbage "a"])))
     describe "Counting groups" $ do
-      it "{}" $ countGroups (Group []) `shouldBe` 1
-      it "{{{}}}" $ countGroups (Group [Group [Group []]]) `shouldBe` 3
-      it "{{},{}}" $ countGroups (Group [Group [], Group []]) `shouldBe` 3
-      it "{{{},{},{{}}}}" $
-        countGroups (Group [Group [Group [], Group [], Group [Group []]]]) `shouldBe`
-        6
+      "{}" `shouldCountAs` 1
+      "{{{}}}" `shouldCountAs` 3
+      "{{},{}}" `shouldCountAs` 3
+      "{{{},{},{{}}}}" `shouldCountAs` 6
+      "{<{},{},{{}}>}" `shouldCountAs` 1
+      "{<a>,<a>,<a>,<a>}" `shouldCountAs` 1
+      "{{<a>},{<a>},{<a>},{<a>}}" `shouldCountAs` 5
+      "{{<!>},{<!>},{<!>},{<a>}}" `shouldCountAs` 2
     describe "Scoring groups" $ do
-      it "{}" $ scoreGroups 1 (Group []) `shouldBe` 1
-      it "{{{}}}" $ scoreGroups 1 (Group [Group [Group []]]) `shouldBe` 6
-      it "{{{},{},{{}}}}" $
-        scoreGroups 1 (Group [Group [Group [], Group [], Group [Group []]]]) `shouldBe`
-        16
+      "{}" `shouldScoreAs` 1
+      "{{{}}}" `shouldScoreAs` 6
+      "{{},{}}" `shouldScoreAs` 5
+      "{{{},{},{{}}}}" `shouldScoreAs` 16
+      "{<a>,<a>,<a>,<a>}" `shouldScoreAs` 1
+      "{{<ab>},{<ab>},{<ab>},{<ab>}}" `shouldScoreAs` 9
+      "{{<!!>},{<!!>},{<!!>},{<!!>}}" `shouldScoreAs` 9
+      "{{<a!>},{<a!>},{<a!>},{<ab>}}" `shouldScoreAs` 3
 
--- Wow this is magic al
+shouldScoreAs inputString expectation =
+  it inputString $
+  (scoreGroups 1 <$> (parse parseGroups "" inputString)) `shouldBe`
+  (Right expectation)
+
+shouldCountAs inputString expectation =
+  it inputString $
+  (countGroups <$> (parse parseGroups "" inputString)) `shouldBe`
+  (Right expectation)
+
+-- Wow this is magical
 shouldParseAs inputString parser expectation =
   it inputString $ parse parser "" inputString `shouldBe` expectation

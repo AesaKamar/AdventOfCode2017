@@ -49,6 +49,6 @@ countGroups (Garbage _) = 0
 countGroups (Group stuff) = 1 + sum (countGroups <$> stuff)
 
 scoreGroups :: Int -> Input -> Int
-scoreGroups level (Garbage _) = level
+scoreGroups level (Garbage _) = 0
 scoreGroups level (Group stuff) =
   level + sum (scoreGroups (level + 1) <$> stuff)
