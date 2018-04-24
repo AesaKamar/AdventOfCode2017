@@ -69,6 +69,14 @@ main =
       "{{<ab>},{<ab>},{<ab>},{<ab>}}" `shouldScoreAs` 9
       "{{<!!>},{<!!>},{<!!>},{<!!>}}" `shouldScoreAs` 9
       "{{<a!>},{<a!>},{<a!>},{<ab>}}" `shouldScoreAs` 3
+    describe "Counting nonescaped chars" $ do
+      "<>" `shouldCountNonEscapedCharsAs` 0
+      "<random characters>" `shouldCountNonEscapedCharsAs` 17
+      "<<<<>" `shouldCountNonEscapedCharsAs` 3
+      "<{!>}>" `shouldCountNonEscapedCharsAs` 2
+      "<!!>" `shouldCountNonEscapedCharsAs` 0
+      "<!!!>>" `shouldCountNonEscapedCharsAs` 0
+      "<{o\"i!a,<{i<a>" `shouldCountNonEscapedCharsAs` 10
 
 shouldScoreAs inputString expectation =
   it inputString $
@@ -79,6 +87,12 @@ shouldCountAs inputString expectation =
   it inputString $
   (countGroups <$> (parse parseGroups "" inputString)) `shouldBe`
   (Right expectation)
+
+shouldCountNonEscapedCharsAs inputString expectation =
+  let removeFirstLast xs = tail (init xs)
+      minusTwoOuters = removeFirstLast inputString
+  in it inputString $
+     (countNonEscapedChars minusTwoOuters) `shouldBe` expectation
 
 -- Wow this is magical
 shouldParseAs inputString parser expectation =

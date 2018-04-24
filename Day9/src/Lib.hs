@@ -52,3 +52,21 @@ scoreGroups :: Int -> Input -> Int
 scoreGroups level (Garbage _) = 0
 scoreGroups level (Group stuff) =
   level + sum (scoreGroups (level + 1) <$> stuff)
+
+countGarbage :: Input -> Int
+countGarbage (Garbage contents) = countNonEscapedChars contents
+countGarbage (Group stuff) = sum (countGarbage <$> stuff)
+
+countNonEscapedChars :: String -> Int
+countNonEscapedChars inputString =
+  snd $
+  foldl
+    (\(isEscaped, acc) thisLetter ->
+       if isEscaped
+         then (False, acc)
+         else if thisLetter == '!'
+                then (True, acc)
+                else (False, acc + 1))
+    (False, 0)
+    inputString
+-- EOF
