@@ -24,8 +24,8 @@ parserGarbage = do
   _ <- string ">"
   return (Garbage $ concat contents)
 
-normalChars :: Parser [Char]
-normalChars = (many1 validChars) <|> try escapedPair
+normalChars :: Parser String
+normalChars = many1 validChars <|> try escapedPair
   where
     validChars =
       oneOf
@@ -33,7 +33,7 @@ normalChars = (many1 validChars) <|> try escapedPair
          ['\'', '\"', '<', ' ', '{', '}', ','])
     specialChars = oneOf ['>', '!']
     escapedPair = do
-      exclamation <- (char '!')
+      exclamation <- char '!'
       following <- validChars <|> specialChars
       return [exclamation, following]
 
@@ -51,4 +51,4 @@ countGroups (Group stuff) = 1 + sum (countGroups <$> stuff)
 scoreGroups :: Int -> Input -> Int
 scoreGroups level (Garbage _) = level
 scoreGroups level (Group stuff) =
-  level + sum ((scoreGroups (level + 1)) <$> stuff)
+  level + sum (scoreGroups (level + 1) <$> stuff)
