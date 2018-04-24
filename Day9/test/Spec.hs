@@ -1,14 +1,14 @@
 module Main where
 
-import Control.Arrow (left)
-import Control.Exception (evaluate)
-import Lib
-import Test.Tasty.Hspec
-import Text.Parsec
-import Text.Parsec.Char
-import Text.Parsec.Combinator
-import Text.Parsec.Prim
-import Text.Parsec.String
+import           Control.Arrow          (left)
+import           Control.Exception      (evaluate)
+import           Lib
+import           Test.Tasty.Hspec
+import           Text.Parsec
+import           Text.Parsec.Char
+import           Text.Parsec.Combinator
+import           Text.Parsec.Prim
+import           Text.Parsec.String
 
 instance Eq ParseError where
   (==) _ _ = True

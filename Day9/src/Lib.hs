@@ -2,13 +2,13 @@
 
 module Lib where
 
-import Data.Maybe (maybeToList)
-import Data.Monoid
-import Text.Parsec
-import Text.Parsec.Char
-import Text.Parsec.Combinator
-import Text.Parsec.Prim
-import Text.Parsec.String
+import           Data.Maybe             (maybeToList)
+import           Data.Monoid
+import           Text.Parsec
+import           Text.Parsec.Char
+import           Text.Parsec.Combinator
+import           Text.Parsec.Prim
+import           Text.Parsec.String
 
 type RandomChars = String
 
@@ -45,7 +45,7 @@ parseGroups = do
   return (Group stuff)
 
 countGroups :: Input -> Int
-countGroups (Garbage _) = 0
+countGroups (Garbage _)   = 0
 countGroups (Group stuff) = 1 + sum (countGroups <$> stuff)
 
 scoreGroups :: Int -> Input -> Int
@@ -55,7 +55,7 @@ scoreGroups level (Group stuff) =
 
 countGarbage :: Input -> Int
 countGarbage (Garbage contents) = countNonEscapedChars contents
-countGarbage (Group stuff) = sum (countGarbage <$> stuff)
+countGarbage (Group stuff)      = sum (countGarbage <$> stuff)
 
 countNonEscapedChars :: String -> Int
 countNonEscapedChars inputString =
