@@ -2,6 +2,7 @@
 
 module Lib where
 
+import Data.Maybe (maybeToList)
 import Data.Monoid
 import Text.Parsec
 import Text.Parsec.Char
@@ -34,3 +35,10 @@ normalChars = (many1 validChars) <|> try escapedPair
       exclamation <- (char '!')
       following <- validChars <|> specialChars
       return [exclamation, following]
+
+parseGroups :: Parser Input
+parseGroups = do
+  _ <- string "{"
+  stuff <- (parseGroups <|> parserGarbage) `sepBy` string ","
+  _ <- string "}"
+  return (Group stuff)

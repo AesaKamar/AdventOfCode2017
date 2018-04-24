@@ -16,7 +16,7 @@ instance Eq ParseError where
 main :: IO ()
 main =
   hspec $ do
-    describe "Lookin for garbage" $ do
+    describe "Looking for garbage" $ do
       shouldParseAs "<>" parserGarbage (Right (Garbage ""))
       shouldParseAs
         "<random characters>"
@@ -31,6 +31,26 @@ main =
         "<{o\"i!a,<{i<a>"
         parserGarbage
         (Right $ Garbage "{o\"i!a,<{i<a")
+    describe "Looking for groups" $ do
+      shouldParseAs "{}" parseGroups (Right $ Group [])
+      shouldParseAs "{{{}}}" parseGroups (Right $ Group [Group [Group []]])
+      shouldParseAs "{{},{}}" parseGroups (Right $ Group [Group [], Group []])
+      shouldParseAs
+        "{{{},{},{{}}}}"
+        parseGroups
+        (Right $ Group [Group [Group [], Group [], Group [Group []]]])
+      shouldParseAs
+        "{<{},{},{{}}>}"
+        parseGroups
+        (Right $ Group [Garbage "{},{},{{}}"])
+      shouldParseAs
+        "{<a>,<a>,<a>,<a>}"
+        parseGroups
+        (Right $ Group (replicate 4 (Garbage "a")))
+      shouldParseAs
+        "{{<a>},{<a>},{<a>},{<a>}}"
+        parseGroups
+        (Right $ Group (replicate 4 (Group [Garbage "a"])))
 
 -- Wow this is magical
 shouldParseAs inputString parser expectation =
