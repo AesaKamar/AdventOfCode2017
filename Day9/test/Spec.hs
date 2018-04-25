@@ -85,7 +85,7 @@ shouldCountAs inputString expectation =
   (Right expectation)
 
 shouldCountNonEscapedCharsAs inputString expectation =
-  let removeFirstLast xs = tail (init xs)
+  let removeFirstLast xs = (tail . init) xs
       minusTwoOuters = removeFirstLast inputString
   in it inputString $
      (countNonEscapedChars minusTwoOuters) `shouldBe` expectation
