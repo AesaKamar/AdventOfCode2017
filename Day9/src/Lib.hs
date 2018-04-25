@@ -17,30 +17,29 @@ data Input
   | Group [Input]
   deriving (Show, Eq)
 
-parserGarbage :: Parser Input
-parserGarbage = do
+parseGarbage :: Parser Input
+parseGarbage = do
   _ <- string "<"
   contents <- many normalChars
   _ <- string ">"
   return (Garbage $ concat contents)
 
 normalChars :: Parser String
-normalChars = many1 validChars <|> try escapedPair
+normalChars = many1 (oneOf validChars) <|> try escapedPair
   where
     validChars =
-      oneOf
-        (['a' .. 'z'] <> ['A' .. 'Z'] <> ['0' .. '9'] <>
-         ['\'', '\"', '<', ' ', '{', '}', ','])
-    specialChars = oneOf ['>', '!']
+      ['a' .. 'z'] <> ['A' .. 'Z'] <> ['0' .. '9'] <>
+      ['\'', '\"', '<', ' ', '{', '}', ',']
+    specialChars = ['>', '!']
     escapedPair = do
       exclamation <- char '!'
-      following <- validChars <|> specialChars
+      following <- oneOf validChars <|> oneOf specialChars
       return [exclamation, following]
 
 parseGroups :: Parser Input
 parseGroups = do
   _ <- string "{"
-  stuff <- (parseGroups <|> parserGarbage) `sepBy` string ","
+  stuff <- (parseGroups <|> parseGarbage) `sepBy` string ","
   _ <- string "}"
   return (Group stuff)
 

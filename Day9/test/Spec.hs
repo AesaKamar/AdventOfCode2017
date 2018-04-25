@@ -17,40 +17,34 @@ main :: IO ()
 main =
   hspec $ do
     describe "Looking for garbage" $ do
-      shouldParseAs "<>" parserGarbage (Right (Garbage ""))
+      shouldParseAs "<>" parseGarbage (Garbage "")
       shouldParseAs
         "<random characters>"
-        parserGarbage
-        (Right (Garbage "random characters"))
-      shouldParseAs "<<<<>" parserGarbage (Right $ Garbage "<<<")
-      shouldParseAs "<!>>" parserGarbage (Right $ Garbage "!>")
-      shouldParseAs "<{!>}>" parserGarbage (Right $ Garbage "{!>}")
-      shouldParseAs "<!!>" parserGarbage (Right $ Garbage "!!")
-      shouldParseAs "<!!!>>" parserGarbage (Right $ Garbage "!!!>")
-      shouldParseAs
-        "<{o\"i!a,<{i<a>"
-        parserGarbage
-        (Right $ Garbage "{o\"i!a,<{i<a")
+        parseGarbage
+        (Garbage "random characters")
+      shouldParseAs "<<<<>" parseGarbage (Garbage "<<<")
+      shouldParseAs "<!>>" parseGarbage (Garbage "!>")
+      shouldParseAs "<{!>}>" parseGarbage (Garbage "{!>}")
+      shouldParseAs "<!!>" parseGarbage (Garbage "!!")
+      shouldParseAs "<!!!>>" parseGarbage (Garbage "!!!>")
+      shouldParseAs "<{o\"i!a,<{i<a>" parseGarbage (Garbage "{o\"i!a,<{i<a")
     describe "Looking for groups" $ do
-      shouldParseAs "{}" parseGroups (Right $ Group [])
-      shouldParseAs "{{{}}}" parseGroups (Right $ Group [Group [Group []]])
-      shouldParseAs "{{},{}}" parseGroups (Right $ Group [Group [], Group []])
+      shouldParseAs "{}" parseGroups (Group [])
+      shouldParseAs "{{{}}}" parseGroups (Group [Group [Group []]])
+      shouldParseAs "{{},{}}" parseGroups (Group [Group [], Group []])
       shouldParseAs
         "{{{},{},{{}}}}"
         parseGroups
-        (Right $ Group [Group [Group [], Group [], Group [Group []]]])
-      shouldParseAs
-        "{<{},{},{{}}>}"
-        parseGroups
-        (Right $ Group [Garbage "{},{},{{}}"])
+        (Group [Group [Group [], Group [], Group [Group []]]])
+      shouldParseAs "{<{},{},{{}}>}" parseGroups (Group [Garbage "{},{},{{}}"])
       shouldParseAs
         "{<a>,<a>,<a>,<a>}"
         parseGroups
-        (Right $ Group (replicate 4 (Garbage "a")))
+        (Group (replicate 4 (Garbage "a")))
       shouldParseAs
         "{{<a>},{<a>},{<a>},{<a>}}"
         parseGroups
-        (Right $ Group (replicate 4 (Group [Garbage "a"])))
+        (Group (replicate 4 (Group [Garbage "a"])))
     describe "Counting groups" $ do
       "{}" `shouldCountAs` 1
       "{{{}}}" `shouldCountAs` 3
@@ -94,7 +88,7 @@ shouldCountNonEscapedCharsAs inputString expectation =
   let removeFirstLast xs = tail (init xs)
       minusTwoOuters = removeFirstLast inputString
   in it inputString $
-     (countNonEscapedChars minusTwoOuters) `shouldBe` expectation
+     (countNonEscapedChars minusTwoOuters) `shouldBe` (Right expectation)
 
 shouldParseAs inputString parser expectation =
-  it inputString $ parse parser "" inputString `shouldBe` expectation
+  it inputString $ parse parser "" inputString `shouldBe` (Right expectation)
