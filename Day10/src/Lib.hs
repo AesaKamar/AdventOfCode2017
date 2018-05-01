@@ -1,6 +1,14 @@
-module Lib
-    ( someFunc
-    ) where
+module Lib  where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+
+
+lengthOfNumberString :: Int
+lengthOfNumberString = 256
+
+numberString :: [Int]
+numberString = [0..255]
+
+
+tieKnot :: [Int] -> Int -> Int -> [Int]
+tieKnot numStr currentIndex skipAmount =
+  []
