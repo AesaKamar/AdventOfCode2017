@@ -24,6 +24,7 @@ dependencies:
 - tasty
 - tasty-hspec
 - pretty-show
+- vector 
 
 library:
   source-dirs: src
@@ -43,7 +44,7 @@ tests:
   Day10-test:
     main:                Spec.hs
     source-dirs:
-    - src     
+    - src
     - test
     ghc-options:
     - -threaded
