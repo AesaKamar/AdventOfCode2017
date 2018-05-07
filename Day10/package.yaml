@@ -24,8 +24,8 @@ dependencies:
 - tasty
 - tasty-hspec
 - pretty-show
-- vector 
-
+- persistent-vector
+- AC-Boolean
 library:
   source-dirs: src
 
