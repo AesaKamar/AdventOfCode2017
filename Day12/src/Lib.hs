@@ -27,7 +27,7 @@ graphBound = (0, 1999)
 parseLine :: Parser (Vertex, [Vertex])
 parseLine = do
   from <- int
-  space >> string "<->" >> space
+  string " <-> "
   tos <- int `sepBy` (string ", ")
   return (from, tos)
 

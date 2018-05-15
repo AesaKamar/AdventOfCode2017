@@ -1,7 +1,9 @@
+{-# LANGUAGE ApplicativeDo #-}
 module Main where
 
+import           Control.Monad.Trans
 import           Data.Graph
-import           Data.Traversable (sequence)
+import           Data.Traversable    (sequence)
 import           Lib
 import           System.IO
 import           Text.Parsec
@@ -10,13 +12,17 @@ import           Text.Show.Pretty
 main :: IO ()
 main = do
   -- contents <- readFile "./sampleinput.txt"
-  contents <- readFile "./day12input.txt"
-  lns <- return $ lines contents
-  fromTos <- return $ sequence $ fmap (parse parseLine "") lns
-  edges <- return $ fmap (\x -> concat (normalize <$> x)) fromTos
-  graph <- return $ fmap (buildG graphBound) edges
-  numReachableFrom0 <- return $
-    length <$> (\gr -> reachable gr 0) <$> graph
-  numComponents <- return $
-    length <$> (\gr -> components gr) <$> graph
-  putStrLn $ ppShow numComponents
+  lns <- lines <$> readFile "./day12input.txt"
+  parsedFromTos <- return $ sequence $ fmap (parse parseLine "") lns
+  answer <- return $ fmap produceAnswers parsedFromTos
+  putStrLn $ ppShow answer
+
+
+produceAnswers :: [(Vertex, [Vertex])] -> (Int, Int)
+produceAnswers fromTos =
+  let
+    edges = concat $ normalize <$> fromTos
+    graph = buildG graphBound edges
+    numReachableFrom0 = (length $ reachable graph 0) + 1
+    numComponents = length $ components graph
+    in (numReachableFrom0, numComponents)
