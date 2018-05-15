@@ -20,7 +20,7 @@ import           Text.Parsec.String
 
 
 graphBound :: Bounds
-graphBound = (0, 2000)
+graphBound = (0, 1999)
 
 
 
