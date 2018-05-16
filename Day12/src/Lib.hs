@@ -16,14 +16,6 @@ import           Text.Parsec.Prim
 import           Text.Parsec.String
 
 
-
-
-
-graphBound :: Bounds
-graphBound = (0, 1999)
-
-
-
 parseLine :: Parser (Vertex, [Vertex])
 parseLine = do
   from <- int
