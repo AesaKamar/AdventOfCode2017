@@ -24,6 +24,8 @@ dependencies:
 - parsec
 - parsec-numbers
 - containers
+- array
+- vector
 - pretty-show
 - tasty
 - tasty-hspec
