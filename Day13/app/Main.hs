@@ -14,10 +14,21 @@ main = do
     cols <-  traverse parseTheStuff lns
     maybeIndexedCols <- pure $ makeIndexedList $ (\c@( Column a b) -> (a, c)) <$> cols
     stuckColIndicies <- pure $ moveScanner [] 0 maybeIndexedCols
+    stuckColAgg <- pure $
+      let
+        this = (\delay -> (moveScanner [] delay maybeIndexedCols)) <$> [0..10000000]
+      in
+        indexOfFirstEmpty this 0
     stuckCols <- pure $ findColumnsByIndex cols stuckColIndicies
     severeties <- pure $ calculateSeverity  <$> (catMaybes stuckCols)
-    pure $ sum severeties
+    pure $ (sum severeties, stuckColAgg)
   print res
 
 
 parseTheStuff str = parse columnParser "" str
+
+
+indexOfFirstEmpty ::  [[a]] -> Integer -> Integer
+indexOfFirstEmpty []  i      = 777
+indexOfFirstEmpty ([] : _) i = i
+indexOfFirstEmpty (a: as) i  = indexOfFirstEmpty  as (i + 1)
