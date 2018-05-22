@@ -1,5 +1,6 @@
 module Main where
 
+import           Data.List        (find)
 import           Data.Traversable
 import           Lib
 import           System.IO
@@ -13,7 +14,7 @@ main = do
     indexedColumns <- fmap (fmap (\c@( Column a b) -> (a, c))) parsedCols
     pure $  makeIndexedList indexedColumns
   stuckColumnIndicies <- pure $ moveScanner [] 0 <$> eitherIndexedColumns
-  severities <- pure $ fmap(\x -> x) stuckColumnIndicies
+  stuckColumns <- pure $ fmap(findColumnsByIndex <$> parsedCols) stuckColumnIndicies
   pure ()
 
 

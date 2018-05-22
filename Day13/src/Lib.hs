@@ -5,11 +5,13 @@ import           Control.Arrow                        (second)
 import qualified Data.Array                           as Array
 import qualified Data.Array.IArray                    as IArray
 import qualified Data.Ix                              as Ix
+import           Data.List                            (find)
 import           Data.Semigroup                       ((<>))
 import           Text.Parsec.Char
 import           Text.Parsec.Prim
 import           Text.Parsec.String
 import           Text.ParserCombinators.Parsec.Number (int)
+
 
 type IndexX = Integer
 type IndexY = Integer
@@ -53,6 +55,9 @@ makeIndexedList elems =
     arrayOfNothing = Array.array (0, 100) ( (\i ->(i, Nothing)) <$> [0..100])
     arrayWithSomething = arrayOfNothing Array.// (second Just <$> elems)
   in IArray.elems arrayWithSomething
+
+findColumnsByIndex :: [Column] -> [IndexX] -> [Maybe Column]
+findColumnsByIndex cols idxs= fmap (\ix -> (find(\(Column cx cs) ->  cx==ix) cols)) idxs
 
 calculateSeverity :: Column -> Integer
 calculateSeverity (Column idxx size) = idxx * size
