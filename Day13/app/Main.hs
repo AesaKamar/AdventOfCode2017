@@ -8,14 +8,13 @@ import           Text.Parsec.Prim
 main :: IO ()
 main = do
   lns <-  lines  <$> readFile "./input"
-  -- Put this in a do stmt
-  columns <- pure $ do
-    parsed <-  traverse parseTheStuff lns
-    indexedColumns <- pure $ (\c@( Column a b) -> (a, c)) <$> parsed
+  parsedCols <- pure $ traverse parseTheStuff lns
+  eitherIndexedColumns <- pure $ do
+    indexedColumns <- fmap (fmap (\c@( Column a b) -> (a, c))) parsedCols
     pure $  makeIndexedList indexedColumns
-  stuckColumns <- pure $ moveScanner [] 0 <$> columns
+  stuckColumnIndicies <- pure $ moveScanner [] 0 <$> eitherIndexedColumns
+  severities <- pure $ fmap(\x -> x) stuckColumnIndicies
   pure ()
-
 
 
 parseTheStuff str = parse columnParser "" str

@@ -54,6 +54,9 @@ makeIndexedList elems =
     arrayWithSomething = arrayOfNothing Array.// (second Just <$> elems)
   in IArray.elems arrayWithSomething
 
+calculateSeverity :: Column -> Integer
+calculateSeverity (Column idxx size) = idxx * size
+
 columnParser :: Parser Column
 columnParser = do
   num1 <- int
