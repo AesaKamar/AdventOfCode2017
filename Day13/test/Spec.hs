@@ -21,8 +21,8 @@ main = hspec $ do
       (moveScanner [] 0 columns) `shouldBe` [0, 6]
       where
         columns = [ Just (Column 0 3)
-                  , Just (Column 1 2)]
-                  -- , Nothing, Nothing
-                  -- , Just (Column 4 4)
-                  -- , Nothing
-                  -- , Just (Column 6 4)]
+                  , Just (Column 1 2)
+                  , Nothing, Nothing
+                  , Just (Column 4 4)
+                  , Nothing
+                  , Just (Column 6 4)]

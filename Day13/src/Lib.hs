@@ -17,7 +17,6 @@ data Column = Column IndexX Size
 
 moveSecurityBot :: Size -> Integer -> IndexY
 moveSecurityBot lengthOfArray picoseconds =
-
   let splength = ((lengthOfArray-1) *2)
       pos = picoseconds `mod` splength
   in
@@ -29,12 +28,13 @@ moveSecurityBot lengthOfArray picoseconds =
 moveScanner :: [IndexX] -> Integer -> [Maybe Column] -> [IndexX]
 moveScanner stucks pcs [] = stucks
 moveScanner stucks pcs (Nothing : restOfColumns) =
-  moveScanner stucks (pcs + 1) restOfColumns
+  moveScanner stucks (succ pcs) restOfColumns
 moveScanner stucks  pcs (Just (Column x len) : restOfColumns) =
   let
     securityBotPos = moveSecurityBot len pcs
     scannerPos = 0
+    nextPcs = (succ pcs)
   in
     if scannerPos /= securityBotPos
-    then moveScanner stucks (pcs + 1) restOfColumns
-    else moveScanner (stucks <> [x]) (pcs + 1) (Just (Column x len) : restOfColumns)
+    then moveScanner stucks nextPcs restOfColumns
+    else moveScanner (stucks <> pure x) nextPcs restOfColumns
