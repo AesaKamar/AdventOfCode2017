@@ -2,11 +2,11 @@
 
 module Main where
 
-import qualified Data.List as L
+import qualified Data.List              as L
 import qualified Data.Vector.Persistent as V
-import Lib
-import Test.Tasty.Hspec
-import Text.Show.Pretty
+import           Lib
+import           Test.Tasty.Hspec
+import           Text.Show.Pretty
 
 main :: IO ()
 main =

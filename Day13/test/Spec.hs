@@ -1,8 +1,8 @@
 module Main where
 
-import Lib
-import Test.Tasty
-import Test.Tasty.Hspec
+import           Lib
+import           Test.Tasty
+import           Test.Tasty.Hspec
 
 main :: IO ()
 main =

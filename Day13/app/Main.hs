@@ -1,13 +1,13 @@
 module Main where
 
-import Control.Applicative ((<**>))
-import Data.Foldable (any)
-import Data.List (find)
-import Data.Maybe (catMaybes)
-import Data.Traversable
-import Lib
-import System.IO
-import Text.Parsec.Prim
+import           Control.Applicative ((<**>))
+import           Data.Foldable       (any)
+import           Data.List           (find)
+import           Data.Maybe          (catMaybes)
+import           Data.Traversable
+import           Lib
+import           System.IO
+import           Text.Parsec.Prim
 
 main :: IO ()
 main = do
@@ -35,7 +35,7 @@ main = do
 parseTheStuff str = parse columnParser "" str
 
 indexOfFirstEmpty :: [[a]] -> Integer -> Maybe Integer
-indexOfFirstEmpty [] i = Nothing
+indexOfFirstEmpty [] i     = Nothing
 indexOfFirstEmpty ([]:_) i = Just i
 indexOfFirstEmpty (a:as) i = indexOfFirstEmpty as (i + 1)
 

@@ -1,6 +1,5 @@
 module Main where
 
-
 import           Control.Monad
 import           Data.Foldable                       (foldl)
 import           Data.Map.Strict                     as Map
@@ -12,7 +11,8 @@ import           System.IO
 import           Text.Parsec
 import           Text.Show.Pretty
 
-colorPrint = putStrLn . (hscolour TTY defaultColourPrefs False False "" False) . ppShow
+colorPrint =
+  putStrLn . (hscolour TTY defaultColourPrefs False False "" False) . ppShow
 
 main :: IO ()
 main = do
@@ -21,9 +21,7 @@ main = do
   result <- return $ combiningMapOperation <$> collected
   colorPrint result
 
-
-
-combiningMapOperation mp =
+combiningMapOperation mp
   -- mp
   -- sum <$> mp
-  sum . maxsubseq <$> mp
+ = sum . maxsubseq <$> mp

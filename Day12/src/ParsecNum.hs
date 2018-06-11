@@ -1,6 +1,6 @@
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
-
-{-# LANGUAGE FlexibleContexts #-}
 {- |
 Module      :  Text/Parsec/Number.hs
 Description :  portable number parsers
@@ -63,7 +63,6 @@ may be a problem and the class `RealFloat` is needed to check for minimal and
 maximal exponents.
 
 -}
-
 module ParsecNum where
 
 import           Control.Monad (ap, liftM)
@@ -71,7 +70,6 @@ import           Data.Char     (digitToInt)
 import           Text.Parsec
 
 -- * floats
-
 -- | parse a decimal unsigned floating point number containing a dot, e or E
 floating :: (Floating f, Stream s m Char) => ParsecT s u m f
 floating = do
@@ -90,79 +88,90 @@ floating3 b = genFractAndExp 0 (fraction True) exponentFactor <|> floating2 b
 
 {- | same as 'floating' but returns a non-negative integral wrapped by Left if
 a fractional part and exponent is missing -}
-decimalFloat :: (Integral i, Floating f, Stream s m Char)
-  => ParsecT s u m (Either i f)
+decimalFloat ::
+     (Integral i, Floating f, Stream s m Char) => ParsecT s u m (Either i f)
 decimalFloat = decFloat True
 
 {- | same as 'floating' but returns a non-negative integral wrapped by Left if
 a fractional part and exponent is missing -}
-decFloat :: (Integral i, Floating f, Stream s m Char)
-  => Bool -> ParsecT s u m (Either i f)
+decFloat ::
+     (Integral i, Floating f, Stream s m Char)
+  => Bool
+  -> ParsecT s u m (Either i f)
 decFloat b = do
   n <- decimal
   option (Left n) $ liftM Right $ fractExp (toInteger n) b
 
 -- | parse a hexadecimal floating point number
-hexFloat :: (Integral i, Floating f, Stream s m Char)
-  => Bool -> ParsecT s u m (Either i f)
+hexFloat ::
+     (Integral i, Floating f, Stream s m Char)
+  => Bool
+  -> ParsecT s u m (Either i f)
 hexFloat b = do
   n <- hexnum
   option (Left n) $ liftM Right $ hexFractExp (toInteger n) b
 
 -- | parse a binary floating point number
-binFloat :: (Integral i, Floating f, Stream s m Char)
-  => Bool -> ParsecT s u m (Either i f)
+binFloat ::
+     (Integral i, Floating f, Stream s m Char)
+  => Bool
+  -> ParsecT s u m (Either i f)
 binFloat b = do
   n <- binary
   option (Left n) $ liftM Right $ binFractExp (toInteger n) b
 
 -- | parse hexadecimal, octal or decimal integrals or 'floating'
-natFloat :: (Integral i, Floating f, Stream s m Char)
-  => ParsecT s u m (Either i f)
+natFloat ::
+     (Integral i, Floating f, Stream s m Char) => ParsecT s u m (Either i f)
 natFloat = (char '0' >> zeroNumFloat) <|> decimalFloat
 
 -- ** float parts
-
 {- | parse any hexadecimal, octal, decimal or floating point number following
 a zero -}
-zeroNumFloat :: (Integral i, Floating f, Stream s m Char)
-  => ParsecT s u m (Either i f)
+zeroNumFloat ::
+     (Integral i, Floating f, Stream s m Char) => ParsecT s u m (Either i f)
 zeroNumFloat =
-  liftM Left hexOrOct
-  <|> decimalFloat
-  <|> liftM Right (fractExponent 0)
-  <|> return (Left 0)
+  liftM Left hexOrOct <|> decimalFloat <|> liftM Right (fractExponent 0) <|>
+  return (Left 0)
 
 -- | parse a floating point number given the number before a dot, e or E
 fractExponent :: (Floating f, Stream s m Char) => Integer -> ParsecT s u m f
 fractExponent i = fractExp i True
 
 -- | parse a hex floating point number given the number before a dot, p or P
-hexFractExp :: (Floating f, Stream s m Char) => Integer -> Bool
-  -> ParsecT s u m f
+hexFractExp ::
+     (Floating f, Stream s m Char) => Integer -> Bool -> ParsecT s u m f
 hexFractExp i b = genFractExp i (hexFraction b) hexExponentFactor
 
 -- | parse a binary floating point number given the number before a dot, p or P
-binFractExp :: (Floating f, Stream s m Char) => Integer -> Bool
-  -> ParsecT s u m f
+binFractExp ::
+     (Floating f, Stream s m Char) => Integer -> Bool -> ParsecT s u m f
 binFractExp i b = genFractExp i (binFraction b) hexExponentFactor
 
 -- | parse a floating point number given the number before a dot, e or E
-fractExp :: (Floating f, Stream s m Char) => Integer -> Bool
-  -> ParsecT s u m f
+fractExp :: (Floating f, Stream s m Char) => Integer -> Bool -> ParsecT s u m f
 fractExp i b = genFractExp i (fraction b) exponentFactor
 
 {- | parse a floating point number given the number before the fraction and
 exponent -}
-genFractExp :: (Floating f, Stream s m Char) => Integer -> ParsecT s u m f
-  -> ParsecT s u m (f -> f) -> ParsecT s u m f
-genFractExp i frac expo = case fromInteger i of
-  f -> genFractAndExp f frac expo <|> liftM ($ f) expo
+genFractExp ::
+     (Floating f, Stream s m Char)
+  => Integer
+  -> ParsecT s u m f
+  -> ParsecT s u m (f -> f)
+  -> ParsecT s u m f
+genFractExp i frac expo =
+  case fromInteger i of
+    f -> genFractAndExp f frac expo <|> liftM ($ f) expo
 
 {- | parse a floating point number given the number before the fraction and
 exponent that must follow the fraction -}
-genFractAndExp :: (Floating f, Stream s m Char) => f -> ParsecT s u m f
-  -> ParsecT s u m (f -> f) -> ParsecT s u m f
+genFractAndExp ::
+     (Floating f, Stream s m Char)
+  => f
+  -> ParsecT s u m f
+  -> ParsecT s u m (f -> f)
+  -> ParsecT s u m f
 genFractAndExp f frac = ap (liftM (flip id . (f +)) frac) . option id
 
 -- | parse a floating point exponent starting with e or E
@@ -176,8 +185,8 @@ hexExponentFactor = oneOf "pP" >> extExponentFactor 2 <?> "hex-exponent"
 {- | parse a signed decimal and compute the exponent factor given a base.
 For hexadecimal exponential notation (IEEE 754) the base is 2 and the
 leading character a p. -}
-extExponentFactor :: (Floating f, Stream s m Char)
-  => Int -> ParsecT s u m (f -> f)
+extExponentFactor ::
+     (Floating f, Stream s m Char) => Int -> ParsecT s u m (f -> f)
 extExponentFactor base =
   liftM (flip (*) . exponentValue base) (ap sign (decimal <?> "exponent"))
 
@@ -188,7 +197,6 @@ exponentValue :: Floating f => Int -> Integer -> f
 exponentValue base = (fromIntegral base **) . fromInteger
 
 -- * fractional numbers (with just a decimal point between digits)
-
 -- | parse a fractional number containing a decimal dot
 fractional :: (Fractional f, Stream s m Char) => ParsecT s u m f
 fractional = do
@@ -204,57 +212,63 @@ fractional3 :: (Fractional f, Stream s m Char) => Bool -> ParsecT s u m f
 fractional3 b = fractFract 0 True <|> fractional2 b
 
 -- | a decimal fractional
-decFract :: (Integral i, Fractional f, Stream s m Char)
-  => Bool -> ParsecT s u m (Either i f)
+decFract ::
+     (Integral i, Fractional f, Stream s m Char)
+  => Bool
+  -> ParsecT s u m (Either i f)
 decFract b = do
   n <- decimal
   option (Left n) $ liftM Right $ fractFract (toInteger n) b
 
 -- | a hexadecimal fractional
-hexFract :: (Integral i, Fractional f, Stream s m Char)
-  => Bool -> ParsecT s u m (Either i f)
+hexFract ::
+     (Integral i, Fractional f, Stream s m Char)
+  => Bool
+  -> ParsecT s u m (Either i f)
 hexFract b = do
   n <- hexnum
   option (Left n) $ liftM Right $ genFractFract (toInteger n) $ hexFraction b
 
 -- | a binary fractional
-binFract :: (Integral i, Fractional f, Stream s m Char)
-  => Bool -> ParsecT s u m (Either i f)
+binFract ::
+     (Integral i, Fractional f, Stream s m Char)
+  => Bool
+  -> ParsecT s u m (Either i f)
 binFract b = do
   n <- binary
   option (Left n) $ liftM Right $ genFractFract (toInteger n) $ binFraction b
 
 {- | same as 'fractional' but returns a non-negative integral wrapped by Left if
 a fractional part is missing -}
-decimalFract :: (Integral i, Fractional f, Stream s m Char)
-  => ParsecT s u m (Either i f)
+decimalFract ::
+     (Integral i, Fractional f, Stream s m Char) => ParsecT s u m (Either i f)
 decimalFract = decFract True
 
 -- | parse hexadecimal, octal or decimal integrals or 'fractional'
-natFract :: (Integral i, Fractional f, Stream s m Char)
-  => ParsecT s u m (Either i f)
+natFract ::
+     (Integral i, Fractional f, Stream s m Char) => ParsecT s u m (Either i f)
 natFract = (char '0' >> zeroNumFract) <|> decimalFract
 
 {- | parse any hexadecimal, octal, decimal or fractional number following
 a zero -}
-zeroNumFract :: (Integral i, Fractional f, Stream s m Char)
-  => ParsecT s u m (Either i f)
+zeroNumFract ::
+     (Integral i, Fractional f, Stream s m Char) => ParsecT s u m (Either i f)
 zeroNumFract =
-  liftM Left hexOrOct
-  <|> decimalFract
-  <|> liftM Right (fractFract 0 True)
-  <|> return (Left 0)
+  liftM Left hexOrOct <|> decimalFract <|> liftM Right (fractFract 0 True) <|>
+  return (Left 0)
 
 -- ** fractional parts
-
 -- | parse a fractional number given the number before the dot
-fractFract :: (Fractional f, Stream s m Char) => Integer -> Bool
-  -> ParsecT s u m f
+fractFract ::
+     (Fractional f, Stream s m Char) => Integer -> Bool -> ParsecT s u m f
 fractFract i = genFractFract i . fraction
 
 {- | combine the given number before the dot with a parser for the fractional
 part -}
-genFractFract :: (Fractional f, Stream s m Char) => Integer -> ParsecT s u m f
+genFractFract ::
+     (Fractional f, Stream s m Char)
+  => Integer
+  -> ParsecT s u m f
   -> ParsecT s u m f
 genFractFract i = liftM (fromInteger i +)
 
@@ -271,23 +285,34 @@ binFraction :: (Fractional f, Stream s m Char) => Bool -> ParsecT s u m f
 binFraction b = baseFraction b 2 binDigit
 
 -- | parse a dot followed by base dependent digits as fractional part
-baseFraction :: (Fractional f, Stream s m Char) => Bool -> Int
-  -> ParsecT s u m Char -> ParsecT s u m f
-baseFraction requireDigit base baseDigit = char '.' >>
-  liftM (fractionValue base)
-    ((if requireDigit then many1 else many) baseDigit <?> "fraction")
-  <?> "fraction"
+baseFraction ::
+     (Fractional f, Stream s m Char)
+  => Bool
+  -> Int
+  -> ParsecT s u m Char
+  -> ParsecT s u m f
+baseFraction requireDigit base baseDigit =
+  char '.' >>
+  liftM
+    (fractionValue base)
+    ((if requireDigit
+        then many1
+        else many)
+       baseDigit <?>
+     "fraction") <?>
+  "fraction"
 
 {- | compute the fraction given by a sequence of digits following the dot.
 Only one division is performed and trailing zeros are ignored. -}
 fractionValue :: Fractional f => Int -> String -> f
-fractionValue base = uncurry (/)
-  . foldl (\ (s, p) d ->
-           (p * fromIntegral (digitToInt d) + s, p * fromIntegral base))
-    (0, 1) . dropWhile (== '0') . reverse
+fractionValue base =
+  uncurry (/) .
+  foldl
+    (\(s, p) d -> (p * fromIntegral (digitToInt d) + s, p * fromIntegral base))
+    (0, 1) .
+  dropWhile (== '0') . reverse
 
 -- * integers and naturals
-
 {- | parse an optional 'sign' immediately followed by a 'nat'. Note, that in
 Daan Leijen's code the sign was wrapped as lexeme in order to skip comments
 and spaces in between. -}
@@ -316,11 +341,9 @@ nat :: (Integral i, Stream s m Char) => ParsecT s u m i
 nat = zeroNumber <|> decimal
 
 -- ** natural parts
-
 -- | parse a 'nat' syntactically starting with a zero
 zeroNumber :: (Integral i, Stream s m Char) => ParsecT s u m i
-zeroNumber =
-  char '0' >> (hexOrOct <|> decimal <|> return 0) <?> ""
+zeroNumber = char '0' >> (hexOrOct <|> decimal <|> return 0) <?> ""
 
 -- | hexadecimal or octal number
 hexOrOct :: (Integral i, Stream s m Char) => ParsecT s u m i
@@ -339,8 +362,8 @@ octal :: (Integral i, Stream s m Char) => ParsecT s u m i
 octal = oneOf "oO" >> number 8 octDigit
 
 -- | parse a non-negative number given a base and a parser for the digits
-number :: (Integral i, Stream s m t) => Int -> ParsecT s u m Char
-  -> ParsecT s u m i
+number ::
+     (Integral i, Stream s m t) => Int -> ParsecT s u m Char -> ParsecT s u m i
 number base baseDigit = do
   n <- liftM (numberValue base) (many1 baseDigit)
   seq n (return n)
@@ -348,4 +371,4 @@ number base baseDigit = do
 -- | compute the value from a string of digits using a base
 numberValue :: Integral i => Int -> String -> i
 numberValue base =
-  foldl (\ x -> ((fromIntegral base * x) +) . fromIntegral . digitToInt) 0
+  foldl (\x -> ((fromIntegral base * x) +) . fromIntegral . digitToInt) 0

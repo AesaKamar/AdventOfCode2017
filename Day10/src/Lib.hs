@@ -1,8 +1,8 @@
 module Lib where
 
-import qualified Data.Boolean as B
-import qualified Data.List as L
-import Data.Monoid
+import qualified Data.Boolean           as B
+import qualified Data.List              as L
+import           Data.Monoid
 import qualified Data.Vector.Persistent as V
 
 lengthOfNumberString :: Int

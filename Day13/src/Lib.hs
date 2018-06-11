@@ -2,16 +2,16 @@
 
 module Lib where
 
-import Control.Arrow (second)
-import qualified Data.Array as Array
-import qualified Data.Array.IArray as IArray
-import qualified Data.Ix as Ix
-import Data.List (find)
-import Data.Semigroup ((<>))
-import Text.Parsec.Char
-import Text.Parsec.Prim
-import Text.Parsec.String
-import Text.ParserCombinators.Parsec.Number (int)
+import           Control.Arrow                        (second)
+import qualified Data.Array                           as Array
+import qualified Data.Array.IArray                    as IArray
+import qualified Data.Ix                              as Ix
+import           Data.List                            (find)
+import           Data.Semigroup                       ((<>))
+import           Text.Parsec.Char
+import           Text.Parsec.Prim
+import           Text.Parsec.String
+import           Text.ParserCombinators.Parsec.Number (int)
 
 type IndexX = Integer
 

@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+
 module Lib where
 
 import           Control.Applicative                  (many)
@@ -20,14 +21,12 @@ integer = read <$> many1 digit
 nameParser :: Parser String
 nameParser = many letter
 
-
 weightParser :: Parser Int
 weightParser = do
   _ <- char '('
   weight <- integer
   _ <- char ')'
   return weight
-
 
 nameAndWeightParser :: Parser (String, Int)
 nameAndWeightParser = do
@@ -36,27 +35,32 @@ nameAndWeightParser = do
   weight <- weightParser
   return (name, weight)
 
-
-
 subTreeParser :: Parser [String]
 subTreeParser = do
   _ <- space >> char '-' >> char '>'
   space
-  nameWithSubtreeList <- nameParser `sepBy`  ( char ',' >> space)
+  nameWithSubtreeList <- nameParser `sepBy` (char ',' >> space)
   return nameWithSubtreeList
 
 nameWeightAndSubtreesParser :: Parser (String, Int, Maybe [String])
 nameWeightAndSubtreesParser = do
-    nameAndWeight <- nameAndWeightParser
-    theRest <- optionMaybe subTreeParser
-    return (fst nameAndWeight, snd nameAndWeight, theRest)
+  nameAndWeight <- nameAndWeightParser
+  theRest <- optionMaybe subTreeParser
+  return (fst nameAndWeight, snd nameAndWeight, theRest)
 
+data Tree = NonEmptyTree
+  { name     :: String
+  , weight   :: Int
+  , subTrees :: [Tree]
+  }
 
+type TreeEntry = (String, Int, Maybe [String])
 
-
-data Tree = NonEmptyTree { name:: String, weight:: Int, subTrees:: [Tree]}
-type TreeEntry = ( String, Int, Maybe [String])
-data CoTreeEntry = CoTreeEntry  String (Maybe Int) (Maybe String) deriving (Show, Eq)
+data CoTreeEntry =
+  CoTreeEntry String
+              (Maybe Int)
+              (Maybe String)
+  deriving (Show, Eq)
 
 reverseTrees :: [TreeEntry] -> [CoTreeEntry]
 reverseTrees = concatMap reverseTree
@@ -68,9 +72,8 @@ reverseTree (name, weight, Just children) =
 
 combineCoTrees :: Tree -> [CoTreeEntry] -> Tree
 combineCoTrees origTree cots =
-  let
-    rootTree = head $ filter hasNoParent cots
-    in foldl (\ tree coTree -> tree) origTree cots
+  let rootTree = head $ filter hasNoParent cots
+  in foldl (\tree coTree -> tree) origTree cots
 
 insert :: Tree -> CoTreeEntry -> Tree
 insert _ CoTreeEntry name maybeWeight Nothing = NonEmp

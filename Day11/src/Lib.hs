@@ -1,6 +1,7 @@
 -- {-# LANGUAGE TemplateHaskell #-}
 --
 module Lib where
+
 --
 -- import Control.Lens
 --
@@ -11,8 +12,7 @@ data Direction1
   | Sw
   | Nw
   | Se
-  deriving (Show, Eq)
---
+  deriving (Show, Eq) --
 -- data HexGrid = HexGrid
 --   { _no :: [Direction]
 --   , _so :: [Direction]

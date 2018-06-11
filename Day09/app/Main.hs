@@ -1,8 +1,8 @@
 module Main where
 
-import Lib
-import System.IO
-import Text.Parsec
+import           Lib
+import           System.IO
+import           Text.Parsec
 
 main :: IO ()
 main = do
